@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+sqlalchemy[asyncio]
+jinja2
+asyncpg
+typer

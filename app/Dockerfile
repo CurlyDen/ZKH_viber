@@ -1,0 +1,29 @@
+# syntax = docker/dockerfile:1.4
+
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim AS builder
+
+WORKDIR /app
+
+# set env variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# FROM builder as dev-envs
+
+# RUN <<EOF
+# apt-get update
+# apt-get install -y --no-install-recommends git
+# EOF
+
+# RUN <<EOF
+# useradd -s /bin/bash -m vscode
+# groupadd docker
+# usermod -aG docker vscode
+# EOF
+# # install Docker tools (cli, buildx, compose)
+# COPY --from=gloursdocker/docker / /

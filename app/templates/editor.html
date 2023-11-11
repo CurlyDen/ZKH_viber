@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <script src="{{ url_for('static', path='/script.js') }}""></script>
+    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="scenario" style="display: none">{{ id }}</div>
+    <div id="data" style="display: none">{{ data }}</div>
+    <div id="contextMenu" class="context-menu" style="display: none"> 
+      <ul class="menu"> 
+          <li id="trash">Удалить</li> 
+      </ul> 
+    </div> 
+    <button id="create">Создать блок</button>
+    <button id="save">Сохранить</button>
+    <div class="block" id="block-1"><div class="message" id="m_start"><b>Начало</b></div></div>
+    <div class="block" id="block-2"><div class="message" id="m_end"><b>Конец</b></div></div>
+  </body>
+</html>

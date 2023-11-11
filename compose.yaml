@@ -1,0 +1,36 @@
+services:
+  api:
+    depends_on:
+      - pgdb
+    build: ./app
+    environment:
+      PORT: 8000
+    ports:
+      - '8000:8000'
+    # restart: always
+
+  pgdb:
+    # Использование готового образа postgres
+    image: postgres
+    # Задание переменных окружения для контейнера с postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+     # Задание имени контейнера для сервиса pgdb
+    container_name: pgdb
+     # Связывание тома с директорией в контейнере для сохранения данных postgres
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data/
+
+      
+
+  # viber_hook:
+  #   restart: always 
+  #   build: ./app
+  #   depends_on:
+  #     - api
+  #   command: python sethook.py
+
+volumes:
+  pgdbdata: null
