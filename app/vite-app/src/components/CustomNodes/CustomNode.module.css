@@ -1,0 +1,126 @@
+.customNode {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 100000;
+}
+
+.functionNode {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.functionNode::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  height: 5px;
+  width: 5px;
+  transform: translate(-50%, 0);
+  background: #f9f9f9;
+  border: 2px solid #222138;
+  z-index: 0;
+  line-height: 1;
+  color: #fff;
+  font-size: 5px;
+}
+
+.customNodeBody {
+  overflow: hidden;
+  width: 160px;
+  height: 50px;
+  border: 2px solid rgb(57, 57, 57);
+  position: relative;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  z-index: 500;
+}
+
+.endpointNode {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 100000;
+}
+
+.endpointNodeBody {
+  overflow: hidden;
+  width: 160px;
+  height: 50px;
+  border: 2px solid rgb(57, 57, 57);
+  position: relative;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+}
+
+.endpointNode:before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  height: 20px;
+  width: 40px;
+  transform: translate(-50%, 0);
+  background: #d5d8e6;
+  z-index: 1000;
+  line-height: 1;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 9px;
+  border: 2px solid #222138;
+}
+
+.customNode:before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  height: 20px;
+  width: 40px;
+  transform: translate(-50%, 0);
+  background: #d5d8e6;
+  z-index: 1000;
+  line-height: 1;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 9px;
+  border: 2px solid #222138;
+}
+
+.customNode::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  height: 5px;
+  width: 5px;
+  transform: translate(-50%, 0);
+  background: #f9f9f9;
+  border: 2px solid #222138;
+  z-index: 0;
+  line-height: 1;
+  color: #fff;
+  font-size: 5px;
+}
+
+.customHandle {
+  width: 100%;
+  height: 100%;
+  background: blue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
+  opacity: 0;
+}
