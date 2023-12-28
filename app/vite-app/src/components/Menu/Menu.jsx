@@ -27,6 +27,11 @@ const Menu = ({
     }
   };
 
+  //Без базы
+  // const handleScenarioClick = (scenario) => {
+  //   setSelectedScenario(scenarioData);
+  // }
+
   const handleCreateClick = () => {
     if (scenarios?.length < 8) {
       const scenario = {
