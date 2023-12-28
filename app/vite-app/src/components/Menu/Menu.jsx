@@ -29,7 +29,7 @@ const Menu = ({
 
   //Без базы
   // const handleScenarioClick = (scenario) => {
-  //   setSelectedScenario(scenarioData);
+  //   setSelectedScenario(scenario);
   // }
 
   const handleCreateClick = () => {
