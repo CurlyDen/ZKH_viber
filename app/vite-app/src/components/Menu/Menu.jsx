@@ -9,28 +9,28 @@ const Menu = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleScenarioClick = async (scenario) => {
-    setIsLoading(true);
+  // const handleScenarioClick = async (scenario) => {
+  //   setIsLoading(true);
 
-    try {
-      const response = await fetch(`/mc_viber/canvas/${scenario.id}`);
-      if (response.ok) {
-        const scenarioData = await response.json();
-        setSelectedScenario(scenarioData);
-      } else {
-        console.error("Failed to fetch scenario data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error during scenario fetch:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  //   try {
+  //     const response = await fetch(`/mc_viber/canvas/${scenario.id}`);
+  //     if (response.ok) {
+  //       const scenarioData = await response.json();
+  //       setSelectedScenario(scenarioData);
+  //     } else {
+  //       console.error("Failed to fetch scenario data:", response.statusText);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during scenario fetch:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // Без базы
+  const handleScenarioClick = (scenario) => {
+    setSelectedScenario(scenario);
   };
-
-  //Без базы
-  // const handleScenarioClick = (scenario) => {
-  //   setSelectedScenario(scenario);
-  // }
 
   const handleCreateClick = () => {
     if (scenarios?.length < 8) {
@@ -75,7 +75,7 @@ const Menu = ({
           className="px-6 py-2 w-[500px] text-lg bg-slate-800 rounded-2xl text-white transition-colors hover:bg-slate-600"
           onClick={() => handleScenarioClick(scenario)}
         >
-          <Link to={`/${scenario.id + 1}`}>{`Сценарий ${
+          <Link to={`/canvas/${scenario.id + 1}`}>{`Сценарий ${
             scenario.id + 1
           }`}</Link>
         </button>
