@@ -6,7 +6,7 @@ services:
     environment:
       PORT: 8000
     ports:
-      - '8000:8000'
+      - "8000:8000"
     # restart: always
 
   pgdb:
@@ -17,16 +17,15 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-     # Задание имени контейнера для сервиса pgdb
-    container_name: pgdb
-     # Связывание тома с директорией в контейнере для сохранения данных postgres
+      # Задание имени контейнера для сервиса pgdb
+    container_name:
+      pgdb
+      # Связывание тома с директорией в контейнере для сохранения данных postgres
     volumes:
       - pgdbdata:/var/lib/postgresql/data/
 
-      
-
   # viber_hook:
-  #   restart: always 
+  #   restart: always
   #   build: ./app
   #   depends_on:
   #     - api

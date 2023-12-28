@@ -1,6 +1,15 @@
 # syntax = docker/dockerfile:1.4
 
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim AS builder
+# Build Stage for Node.js and Vite
+FROM node:14.17.6 as vite-builder
+
+WORKDIR /app/vite-app
+COPY ./vite-app /app/vite-app
+RUN npm install
+RUN npm run build
+
+# Production Stage for Python and FastAPI
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim as production
 
 WORKDIR /app
 
@@ -8,22 +17,14 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the Vite app build from the build stage
+COPY --from=vite-builder /app/vite-app/dist /app/mc_viber/vite-app
+
+# Copy the rest of the FastAPI application
 COPY . .
 
-# FROM builder as dev-envs
-
-# RUN <<EOF
-# apt-get update
-# apt-get install -y --no-install-recommends git
-# EOF
-
-# RUN <<EOF
-# useradd -s /bin/bash -m vscode
-# groupadd docker
-# usermod -aG docker vscode
-# EOF
-# # install Docker tools (cli, buildx, compose)
-# COPY --from=gloursdocker/docker / /
+# ... (rest of your Dockerfile)

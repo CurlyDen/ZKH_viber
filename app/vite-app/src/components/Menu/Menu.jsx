@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Menu = ({
@@ -7,8 +7,24 @@ const Menu = ({
   setScenarios,
   scenarios,
 }) => {
-  const handleScenarioClick = (scenario) => {
-    setSelectedScenario(scenario);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleScenarioClick = async (scenario) => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`/mc_viber/canvas/${scenario.id}`);
+      if (response.ok) {
+        const scenarioData = await response.json();
+        setSelectedScenario(scenarioData);
+      } else {
+        console.error("Failed to fetch scenario data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during scenario fetch:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCreateClick = () => {
@@ -35,6 +51,7 @@ const Menu = ({
           },
         ],
         edges: [],
+        title: "scenario " + (scenarios?.length || 0).toString(),
       };
       setScenarios((prevScenarios) => [...prevScenarios, scenario]);
     }
@@ -47,19 +64,18 @@ const Menu = ({
       >
         Создать сценарий
       </button>
-      {scenarios?.map((scenario) => {
-        return (
-          <button
-            key={scenario.id}
-            className="px-6 py-2 w-[500px] text-lg bg-slate-800 rounded-2xl text-white transition-colors hover:bg-slate-600"
-            onClick={() => handleScenarioClick(scenario)}
-          >
-            <Link to={`/${scenario.id + 1}`}>{`Сценарий ${
-              scenario.id + 1
-            }`}</Link>
-          </button>
-        );
-      })}
+      {scenarios?.map((scenario) => (
+        <button
+          key={scenario.id}
+          className="px-6 py-2 w-[500px] text-lg bg-slate-800 rounded-2xl text-white transition-colors hover:bg-slate-600"
+          onClick={() => handleScenarioClick(scenario)}
+        >
+          <Link to={`/${scenario.id + 1}`}>{`Сценарий ${
+            scenario.id + 1
+          }`}</Link>
+        </button>
+      ))}
+      {isLoading && <p>Loading scenario data...</p>}
     </div>
   );
 };

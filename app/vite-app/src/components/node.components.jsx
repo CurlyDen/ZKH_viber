@@ -68,6 +68,43 @@ const Nodes = ({ scenario, setScenarios }) => {
   const [edgeLabel, setEdgeLabel] = useState("");
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
+  const handleSave = async () => {
+    try {
+      const response = await fetch("/mc_viber/canvas/" + scenario.id, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          blocks: nodes,
+          links: edges,
+          scenario: scenario.title,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Scenario saved successfully");
+      } else {
+        console.error("Failed to save scenario:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during scenario save:", error);
+    }
+  };
+
+  // const handleSave = () => {
+  //   setScenarios((prevScenarios) => {
+  //     const updatedScenarios = prevScenarios.map((prevScenario) => {
+  //       if (prevScenario.id === scenario.id) {
+  //         return { ...prevScenario, nodes: nodes, edges: edges };
+  //       }
+  //       return prevScenario;
+  //     });
+
+  //     return updatedScenarios;
+  //   });
+  // };
+
   const onInit = (reactFlowInstance) => {
     // Save the ReactFlow instance to access pan and zoom values
     setReactFlowInstance(reactFlowInstance);
@@ -196,19 +233,6 @@ const Nodes = ({ scenario, setScenarios }) => {
   const onSelectEdge = (event, edge) => {
     setSelectedEdge(edge);
     setSelectedNode(null);
-  };
-
-  const handleSave = () => {
-    setScenarios((prevScenarios) => {
-      const updatedScenarios = prevScenarios.map((prevScenario) => {
-        if (prevScenario.id === scenario.id) {
-          return { ...prevScenario, nodes: nodes, edges: edges };
-        }
-        return prevScenario;
-      });
-
-      return updatedScenarios;
-    });
   };
 
   return (

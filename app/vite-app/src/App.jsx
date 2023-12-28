@@ -9,13 +9,13 @@ const App = () => {
   const [scenarios, setScenarios] = useState([]);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/mc_viber">
       <div className="w-screen h-screen relative">
         <Routes>
           {scenarios?.map((scenario) => (
             <Route
               key={scenario.id}
-              path={`/${scenario.id + 1}`}
+              path={`/canvas/${scenario.id + 1}`}
               element={
                 <NodesProvider scenario={scenario}>
                   <Nodes scenario={scenario} setScenarios={setScenarios} />
