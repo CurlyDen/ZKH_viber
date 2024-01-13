@@ -22,7 +22,7 @@ num_format = re.compile("^[\-]?[1-9][0-9]*\.?[0-9]+$")
 
 app = FastAPI(docs_url="/mc_viber/docs", redoc_url="/mc_viber/redoc")
 
-app.mount("/mc_viber/static", StaticFiles(directory="static", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 @app.on_event("startup")
 async def startup_event():
