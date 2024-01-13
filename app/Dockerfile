@@ -1,7 +1,5 @@
-# syntax = docker/dockerfile:1.4
-
 # Build Stage for Node.js and Vite
-FROM node:14.17.6 as vite-builder
+FROM node:21-alpine3.18 as vite-builder
 
 WORKDIR /app/static
 COPY ./static /app/static
@@ -22,7 +20,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Vite app build from the build stage
-COPY --from=vite-builder /app/static/ /app/static/
+COPY --from=vite-builder /app/static/dist/ /app/static/
+
+# Specify the STATIC directory in FastAPI
+COPY ./static /app/static
 
 # Copy the rest of the FastAPI application
 COPY . .
