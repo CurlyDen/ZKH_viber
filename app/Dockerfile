@@ -22,7 +22,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Vite app build from the build stage
-COPY --from=vite-builder /app/static /app/mc_viber/static
+COPY --from=vite-builder /app/static/dist /app/mc_viber/static
 
 # Copy the rest of the FastAPI application
 COPY . .
