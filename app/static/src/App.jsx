@@ -9,7 +9,7 @@ const App = () => {
   const [scenarios, setScenarios] = useState([]);
 
   return (
-    <BrowserRouter basename="/mc_viber">
+    <BrowserRouter basename="mc_viber/static">
       <div className="w-screen h-screen relative">
         <Routes>
           {scenarios?.map((scenario) => (

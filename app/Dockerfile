@@ -3,8 +3,8 @@
 # Build Stage for Node.js and Vite
 FROM node:14.17.6 as vite-builder
 
-WORKDIR /app/vite-app
-COPY ./vite-app /app/vite-app
+WORKDIR /app/static
+COPY ./static /app/static
 RUN npm install
 RUN npm run build
 
@@ -22,7 +22,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Vite app build from the build stage
-COPY --from=vite-builder /app/vite-app/dist /app/mc_viber/vite-app
+COPY --from=vite-builder /app/static /app/mc_viber/static
 
 # Copy the rest of the FastAPI application
 COPY . .
