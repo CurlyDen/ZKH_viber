@@ -70,17 +70,20 @@ const Nodes = ({ scenario, setScenarios }) => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("/mc_viber/canvas/" + scenario.id, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          blocks: nodes,
-          links: edges,
-          scenario: scenario.title,
-        }),
-      });
+      const response = await fetch(
+        "localhost:8000/mc_viiber/canvas/" + scenario.id,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            blocks: nodes,
+            links: edges,
+            scenario: scenario.title,
+          }),
+        }
+      );
 
       if (response.ok) {
         console.log("Scenario saved successfully");

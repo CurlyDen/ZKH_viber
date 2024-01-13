@@ -5,24 +5,14 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 import json
 from fastapi.openapi.utils import get_openapi
-
 from sending import send_text
 from models import MessageModel, KeyModel, ScenarioModel
 from db import get_session, AsyncSession, engine, Base
 import db_utility, settings
 
-class SPAStaticFiles(StaticFiles):
-    async def get_response(self, path: str, scope):
-        response = await super().get_response(path, scope)
-        if response.status_code == 404:
-            response = await super().get_response('.', scope)
-        return response
-
 num_format = re.compile("^[\-]?[1-9][0-9]*\.?[0-9]+$")
 
 app = FastAPI(docs_url="/mc_viber/docs", redoc_url="/mc_viber/redoc")
-
-app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 @app.on_event("startup")
 async def startup_event():

@@ -9,27 +9,24 @@ const Menu = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // const handleScenarioClick = async (scenario) => {
-  //   setIsLoading(true);
+  const handleScenarioClick = async (scenario) => {
+    setIsLoading(true);
 
-  //   try {
-  //     const response = await fetch(`/mc_viber/canvas/${scenario.id}`);
-  //     if (response.ok) {
-  //       const scenarioData = await response.json();
-  //       setSelectedScenario(scenarioData);
-  //     } else {
-  //       console.error("Failed to fetch scenario data:", response.statusText);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during scenario fetch:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // Без базы
-  const handleScenarioClick = (scenario) => {
-    setSelectedScenario(scenario);
+    try {
+      const response = await fetch(
+        `localhost:8000/mc_viber/canvas/${scenario.id}`
+      );
+      if (response.ok) {
+        const scenarioData = await response.json();
+        setSelectedScenario(scenarioData);
+      } else {
+        console.error("Failed to fetch scenario data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during scenario fetch:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCreateClick = () => {
