@@ -69,44 +69,48 @@ const Nodes = ({ scenario, setScenarios }) => {
   const [edgeLabel, setEdgeLabel] = useState("");
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
-  const handleSave = async () => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8000/mc_viiber/canvas/${scenario.id}`,
-        {
-          blocks: nodes,
-          links: edges,
-          scenario: scenario.title,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+  // const handleSave = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `http://localhost:8000/mc_viiber/canvas/${scenario.id}`,
+  //       {
+  //         blocks: nodes,
+  //         links: edges,
+  //         scenario: scenario.title,
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
 
-      if (response.status === 200) {
-        console.log("Scenario saved successfully");
-      } else {
-        console.error("Failed to save scenario:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error during scenario save:", error.message);
-    }
+  //     if (response.status === 200) {
+  //       console.log("Scenario saved successfully");
+  //     } else {
+  //       console.error("Failed to save scenario:", response.statusText);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during scenario save:", error.message);
+  //   }
+  // };
+
+  const handleSave = () => {
+    setScenarios((prevScenarios) => {
+      const updatedScenarios = prevScenarios.map((prevScenario) => {
+        if (prevScenario.id === scenario.id) {
+          return { ...prevScenario, nodes: nodes, edges: edges };
+        }
+        return prevScenario;
+      });
+
+      return updatedScenarios;
+    });
   };
 
-  // const handleSave = () => {
-  //   setScenarios((prevScenarios) => {
-  //     const updatedScenarios = prevScenarios.map((prevScenario) => {
-  //       if (prevScenario.id === scenario.id) {
-  //         return { ...prevScenario, nodes: nodes, edges: edges };
-  //       }
-  //       return prevScenario;
-  //     });
-
-  //     return updatedScenarios;
-  //   });
-  // };
+  useEffect(() => {
+    console.log(scenario);
+  }, [scenario]);
 
   const onInit = (reactFlowInstance) => {
     // Save the ReactFlow instance to access pan and zoom values
