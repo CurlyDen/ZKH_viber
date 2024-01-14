@@ -10,9 +10,21 @@ from models import MessageModel, KeyModel, ScenarioModel
 from db import get_session, AsyncSession, engine, Base
 import db_utility, settings
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
 num_format = re.compile("^[\-]?[1-9][0-9]*\.?[0-9]+$")
 
 app = FastAPI(docs_url="/mc_viber/docs", redoc_url="/mc_viber/redoc")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # замените "*" на список разрешенных доменов
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event():
@@ -45,7 +57,7 @@ async def add_scenario(scenario: ScenarioModel, session: AsyncSession = Depends(
         await session.rollback()
         raise HTTPException(status_code=400, detail="The scenario is already stored")
 
-@app.get("/mc_viber/canvas/{id}", response_class=HTMLResponse)
+@app.get("/mc_viber/canvas/{id}", response_model=list[ScenarioModel])
 async def read_scenario(request: Request, id: int, session: AsyncSession = Depends(get_session)):
     scenario = await db_utility.get_scenario(session, id)
     messages = await db_utility.get_messages(session, id)
@@ -61,7 +73,7 @@ async def read_scenario(request: Request, id: int, session: AsyncSession = Depen
         if link.text: text = link.text
         else: text = "/None"
         data["links"][int(link.num)] = {"text": text, "start": id_to_num[link.start], "end": id_to_num[link.end]}
-    return HTMLResponse(content="This is a placeholder. You can serve your React app's HTML here.")
+    return scenario
 
 @app.post("/mc_viber/canvas/{id}")
 async def save_scenario(request: Request, status_code=200, session: AsyncSession = Depends(get_session)):

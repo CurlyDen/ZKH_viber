@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Menu = ({
   selectedScenario,
@@ -13,17 +14,19 @@ const Menu = ({
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `localhost:8000/mc_viber/canvas/${scenario.id}`
+      const response = await axios.get(
+        `http://localhost:8000/mc_viber/canvas/${scenario.id}`
       );
-      if (response.ok) {
-        const scenarioData = await response.json();
+
+      if (response.status === 200) {
+        const scenarioData = response.data;
+        console.log(response.data);
         setSelectedScenario(scenarioData);
       } else {
         console.error("Failed to fetch scenario data:", response.statusText);
       }
     } catch (error) {
-      console.error("Error during scenario fetch:", error);
+      console.error("Error during scenario fetch:", error.message);
     } finally {
       setIsLoading(false);
     }
@@ -31,8 +34,8 @@ const Menu = ({
 
   const handleCreateClick = () => {
     if (scenarios?.length < 8) {
-      const scenario = {
-        id: scenarios?.length || 0,
+      const newScenario = {
+        id: scenarios?.length + 1 || 1,
         nodes: [
           {
             id: "1",
@@ -53,11 +56,21 @@ const Menu = ({
           },
         ],
         edges: [],
-        title: "scenario " + (scenarios?.length || 0).toString(),
+        title: "scenario " + (scenarios?.length + 1 || 1).toString(),
       };
-      setScenarios((prevScenarios) => [...prevScenarios, scenario]);
+
+      axios
+        .post("http://localhost:8000/mc_viber/canvas", newScenario)
+        .then((response) => {
+          const createdScenario = response.data;
+          setScenarios((prevScenarios) => [...prevScenarios, createdScenario]);
+        })
+        .catch((error) => {
+          console.error("Failed to create scenario:", error.message);
+        });
     }
   };
+
   return (
     <div className="h-screen w-full bg-slate-300 flex flex-col items-center gap-2">
       <button
@@ -72,9 +85,7 @@ const Menu = ({
           className="px-6 py-2 w-[500px] text-lg bg-slate-800 rounded-2xl text-white transition-colors hover:bg-slate-600"
           onClick={() => handleScenarioClick(scenario)}
         >
-          <Link to={`/canvas/${scenario.id + 1}`}>{`Сценарий ${
-            scenario.id + 1
-          }`}</Link>
+          <Link to={`/canvas/${scenario.id}`}>{scenario.title}</Link>
         </button>
       ))}
       {isLoading && <p>Loading scenario data...</p>}

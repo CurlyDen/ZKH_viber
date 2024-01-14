@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
+import axios from "axios";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -70,28 +71,27 @@ const Nodes = ({ scenario, setScenarios }) => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(
-        "localhost:8000/mc_viiber/canvas/" + scenario.id,
+      const response = await axios.post(
+        `http://localhost:8000/mc_viiber/canvas/${scenario.id}`,
         {
-          method: "POST",
+          blocks: nodes,
+          links: edges,
+          scenario: scenario.title,
+        },
+        {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            blocks: nodes,
-            links: edges,
-            scenario: scenario.title,
-          }),
         }
       );
 
-      if (response.ok) {
+      if (response.status === 200) {
         console.log("Scenario saved successfully");
       } else {
         console.error("Failed to save scenario:", response.statusText);
       }
     } catch (error) {
-      console.error("Error during scenario save:", error);
+      console.error("Error during scenario save:", error.message);
     }
   };
 

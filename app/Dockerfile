@@ -11,7 +11,6 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # Copy the rest of the FastAPI application
 COPY . .
 
