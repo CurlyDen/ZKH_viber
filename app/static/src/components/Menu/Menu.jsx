@@ -13,23 +13,25 @@ const Menu = ({
   const handleScenarioClick = async (scenario) => {
     setIsLoading(true);
 
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/mc_viber/canvas/${scenario.id}`
-      );
+    // try {
+    //   const response = await axios.get(
+    //     `http://localhost:8000/mc_viber/canvas/${scenario.id}`
+    //   );
 
-      if (response.status === 200) {
-        const scenarioData = response.data;
-        console.log(response.data);
-        setSelectedScenario(scenarioData);
-      } else {
-        console.error("Failed to fetch scenario data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error during scenario fetch:", error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    //   if (response.status === 200) {
+    //     const scenarioData = response.data;
+    //     console.log(response.data);
+    //     setSelectedScenario(scenarioData);
+    //   } else {
+    //     console.error("Failed to fetch scenario data:", response.statusText);
+    //   }
+    // } catch (error) {
+    //   console.error("Error during scenario fetch:", error.message);
+    // } finally {
+    //   setIsLoading(false);
+    // }
+    setSelectedScenario(scenario);
+    setIsLoading(false);
   };
 
   const handleCreateClick = () => {
@@ -38,14 +40,14 @@ const Menu = ({
         id: scenarios?.length + 1 || 1,
         nodes: [
           {
-            id: "1",
+            id: "-1",
             type: "start",
             position: { x: 0, y: 70 },
             data: { label: "Начало", description: "" },
             style: { backgroundColor: "#d1ffbd" },
           },
           {
-            id: "2",
+            id: "-2",
             type: "end",
             position: { x: 160, y: 70 },
             data: {
@@ -58,18 +60,20 @@ const Menu = ({
         edges: [],
         title: "scenario " + (scenarios?.length + 1 || 1).toString(),
       };
-
-      axios
-        .post("http://localhost:8000/mc_viber/canvas", newScenario)
-        .then((response) => {
-          const createdScenario = response.data;
-          setScenarios((prevScenarios) => [...prevScenarios, createdScenario]);
-        })
-        .catch((error) => {
-          console.error("Failed to create scenario:", error.message);
-        });
+      setScenarios((prevScenarios) => [...prevScenarios, newScenario]);
     }
   };
+
+  //   axios
+  //     .post("http://localhost:8000/mc_viber/canvas", newScenario)
+  //     .then((response) => {
+  //       const createdScenario = response.data;
+  //       setScenarios((prevScenarios) => [...prevScenarios, createdScenario]);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Failed to create scenario:", error.message);
+  //     });
+  // }
 
   return (
     <div className="h-screen w-full bg-slate-300 flex flex-col items-center gap-2">
