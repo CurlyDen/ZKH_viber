@@ -18,6 +18,8 @@ num_format = re.compile("^[\-]?[1-9][0-9]*\.?[0-9]+$")
 
 app = FastAPI(docs_url="/mc_viber/docs", redoc_url="/mc_viber/redoc")
 
+functions = ['Считать']
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # замените "*" на список разрешенных доменов
@@ -26,11 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")
+# async def startup_event():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.drop_all)
+#         await conn.run_sync(Base.metadata.create_all)
 
 @app.get("/mc_viber/messages/{id}", response_model=list[MessageModel])
 async def get_messages(id: int, session: AsyncSession = Depends(get_session)):
@@ -54,7 +56,7 @@ async def get_scenarios(session: AsyncSession = Depends(get_session)):
         keys = await db_utility.get_keys(session, s.id)
         links = [KeyModel(num=k.num, scenario=k.scenario, text=k.text, start=k.start, end=k.end) for k in keys]
 
-        data.append(ScenarioModel(title=s.title, id=s.id, blocks=blocks, links=links))
+        data.append(ScenarioModel(title=s.title, id=s.id, blocks=blocks, links=links, functions=functions))
 
     return data
 
@@ -78,7 +80,7 @@ async def read_scenario(request: Request, id: int, session: AsyncSession = Depen
     keys = await db_utility.get_keys(session, scenario.id)
     links = [KeyModel(num=k.num, scenario=k.scenario, text=k.text, start=k.start, end=k.end) for k in keys]
 
-    return ScenarioModel(title=scenario.title, id=scenario.id, blocks=blocks, links=links)
+    return ScenarioModel(title=scenario.title, id=scenario.id, blocks=blocks, links=links, functions=functions)
 
 @app.post("/mc_viber/canvas/{id}")
 async def save_scenario(request: Request, status_code=200, session: AsyncSession = Depends(get_session)):

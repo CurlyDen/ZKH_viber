@@ -25,8 +25,9 @@ class ApplicationModel(BaseModel):
 class ScenarioModel(BaseModel):
     title: str
     id: int
-    blocks: dict
-    links: dict
+    blocks: list
+    links: list
+    functions: list
 
 class MessageModel(BaseModel):
     num: int
