@@ -45,7 +45,18 @@ async def get_links(id: int, session: AsyncSession = Depends(get_session)):
 @app.get("/mc_viber/canvas", response_model=list[ScenarioModel])
 async def get_scenarios(session: AsyncSession = Depends(get_session)):
     scenarios = await db_utility.get_scenarios(session)
-    return [ScenarioModel(title=s.title) for s in scenarios]
+
+    data = []
+    for s in scenarios:
+        messages = await db_utility.get_messages(session, s.id)
+        blocks = [MessageModel(num=m.num, scenario=m.scenario, text=m.text, func=m.func, coords=m.coords) for m in messages]
+
+        keys = await db_utility.get_keys(session, s.id)
+        links = [KeyModel(num=k.num, scenario=k.scenario, text=k.text, start=k.start, end=k.end) for k in keys]
+
+        data.append(ScenarioModel(title=s.title, id=s.id, blocks=blocks, links=links))
+
+    return data
 
 @app.post("/mc_viber/canvas")
 async def add_scenario(scenario: ScenarioModel, session: AsyncSession = Depends(get_session)):
@@ -57,23 +68,17 @@ async def add_scenario(scenario: ScenarioModel, session: AsyncSession = Depends(
         await session.rollback()
         raise HTTPException(status_code=400, detail="The scenario is already stored")
 
-@app.get("/mc_viber/canvas/{id}", response_model=list[ScenarioModel])
+@app.get("/mc_viber/canvas/{id}", response_model=ScenarioModel)
 async def read_scenario(request: Request, id: int, session: AsyncSession = Depends(get_session)):
     scenario = await db_utility.get_scenario(session, id)
-    messages = await db_utility.get_messages(session, id)
-    keys = await db_utility.get_keys(session, id)
-    data = {'blocks': {}, 'links': {}}
-    id_to_num = {}
-    for mes in messages:
-        if mes.func: func = mes.func
-        else: func = "/None"
-        data["blocks"][int(mes.num)] = {"text": mes.text, "coords": mes.coords, "func": func}
-        id_to_num[mes.id] = mes.num
-    for link in keys:
-        if link.text: text = link.text
-        else: text = "/None"
-        data["links"][int(link.num)] = {"text": text, "start": id_to_num[link.start], "end": id_to_num[link.end]}
-    return scenario
+    
+    messages = await db_utility.get_messages(session, scenario.id)
+    blocks = [MessageModel(num=m.num, scenario=m.scenario, text=m.text, func=m.func, coords=m.coords) for m in messages]
+
+    keys = await db_utility.get_keys(session, scenario.id)
+    links = [KeyModel(num=k.num, scenario=k.scenario, text=k.text, start=k.start, end=k.end) for k in keys]
+
+    return ScenarioModel(title=scenario.title, id=scenario.id, blocks=blocks, links=links)
 
 @app.post("/mc_viber/canvas/{id}")
 async def save_scenario(request: Request, status_code=200, session: AsyncSession = Depends(get_session)):
@@ -101,66 +106,66 @@ async def save_scenario(request: Request, status_code=200, session: AsyncSession
         await session.rollback()
         raise HTTPException(status_code=400, detail="Duplicate scenario")
 
-@app.get("/mc_viber/webhook_viber")
-async def viber_bot(request: Request, session: AsyncSession = Depends(get_session)):
-    viber = await request.json()
-    if viber['event'] == 'failed':
-        return JSONResponse(content={"message": viber}, status_code=500)
-    elif viber['event'] == 'unsubscribed':
-        print('Отписка', viber)
-    elif viber['event'] == 'conversation_started':
-        print('Начнём', viber)
-        await conversation(viber, session)
-    elif viber['event'] == 'message':
-        await message(viber, session)
-    else:
-        print(viber['event'])
-    return {"message": "OK"}
+# @app.get("/mc_viber/webhook_viber")
+# async def viber_bot(request: Request, session: AsyncSession = Depends(get_session)):
+#     viber = await request.json()
+#     if viber['event'] == 'failed':
+#         return JSONResponse(content={"message": viber}, status_code=500)
+#     elif viber['event'] == 'unsubscribed':
+#         print('Отписка', viber)
+#     elif viber['event'] == 'conversation_started':
+#         print('Начнём', viber)
+#         await conversation(viber, session)
+#     elif viber['event'] == 'message':
+#         await message(viber, session)
+#     else:
+#         print(viber['event'])
+#     return {"message": "OK"}
 
-async def conversation(viber, session):
-    try:
-        id = viber['user']['id']
-    except:
-        id = viber['sender']['id']
-    st_mess = await db_utility.get_message(session, settings.SCENARIO, -1)
-    link = await db_utility.get_keys_by_message(session, st_mess.id)
-    print(st_mess.num, st_mess.text)
-    ans = await mess_handler(link[0].end, session)
-    send_text(id, str(ans['text']), ans['track'], ans['keys'])
+# async def conversation(viber, session):
+#     try:
+#         id = viber['user']['id']
+#     except:
+#         id = viber['sender']['id']
+#     st_mess = await db_utility.get_message(session, settings.SCENARIO, -1)
+#     link = await db_utility.get_keys_by_message(session, st_mess.id)
+#     print(st_mess.num, st_mess.text)
+#     ans = await mess_handler(link[0].end, session)
+#     send_text(id, str(ans['text']), ans['track'], ans['keys'])
 
-async def message(viber, session):
-    if 'tracking_data' not in viber['message']:
-        await conversation(viber, session)
-    else:
-        id = viber['sender']['id']
-        track_data = viber['message']['tracking_data'].split('\n')
-        print(track_data)
-        ways = track_data[0].split(';;')
-        if re.match(num_format, ways[0]) and int(ways[0]) < 0:
-            ans = await mess_handler(-int(ways[0]), session)
-            req = send_text(id, str(ans['text']), ans['track'], ans['keys'])
-        elif viber['message']['type'] == 'text':
-            if viber['message']['text'] in ways:
-                ans = await mess_handler(int(viber['message']['text']), session)
-                send_text(id, str(ans['text']), ans['track'], ans['keys'])
-            else:
-                err = send_text(id, 'Error')
-                ans = await mess_handler(int(track_data[1]), session)
-                send_text(id, str(ans['text']), ans['track'], ans['keys'])
-        else:
-            err = send_text(id, 'Error')
-            ans = await mess_handler(int(track_data[1]), session)
-            send_text(id, str(ans['text']), ans['track'], ans['keys'])
+# async def message(viber, session):
+#     if 'tracking_data' not in viber['message']:
+#         await conversation(viber, session)
+#     else:
+#         id = viber['sender']['id']
+#         track_data = viber['message']['tracking_data'].split('\n')
+#         print(track_data)
+#         ways = track_data[0].split(';;')
+#         if re.match(num_format, ways[0]) and int(ways[0]) < 0:
+#             ans = await mess_handler(-int(ways[0]), session)
+#             req = send_text(id, str(ans['text']), ans['track'], ans['keys'])
+#         elif viber['message']['type'] == 'text':
+#             if viber['message']['text'] in ways:
+#                 ans = await mess_handler(int(viber['message']['text']), session)
+#                 send_text(id, str(ans['text']), ans['track'], ans['keys'])
+#             else:
+#                 err = send_text(id, 'Error')
+#                 ans = await mess_handler(int(track_data[1]), session)
+#                 send_text(id, str(ans['text']), ans['track'], ans['keys'])
+#         else:
+#             err = send_text(id, 'Error')
+#             ans = await mess_handler(int(track_data[1]), session)
+#             send_text(id, str(ans['text']), ans['track'], ans['keys'])
 
-async def mess_handler(id, session):
-    mess = await db_utility.get_message_by_id(session, id)
-    keys = await db_utility.get_keys_by_message(session, mess.id)
-    track = []
-    keyboard = {}
-    for key in keys:
-        track.append(key.end)
-        if key.num < 0:
-            track[0] = - track[0]
-            return {'text': mess.text, 'track': str(track)+ f'\n{id}', 'keys': None}
-        keyboard[key.text] = key.end
-    return {'text': mess.text, 'track': ';;'.join(list(map(str, track))) + f'\n{id}', 'keys': create_keyboard(keyboard)}
+# async def mess_handler(id, session):
+#     mess = await db_utility.get_message_by_id(session, id)
+#     keys = await db_utility.get_keys_by_message(session, mess.id)
+#     track = []
+#     keyboard = {}
+#     for key in keys:
+#         track.append(key.end)
+#         if key.num < 0:
+#             track[0] = - track[0]
+#             return {'text': mess.text, 'track': str(track)+ f'\n{id}', 'keys': None}
+#         keyboard[key.text] = key.end
+#     return {'text': mess.text, 'track': ';;'.join(list(map(str, track))) + f'\n{id}', 'keys': create_keyboard(keyboard)}

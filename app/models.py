@@ -24,6 +24,9 @@ class ApplicationModel(BaseModel):
 # Scenario editor
 class ScenarioModel(BaseModel):
     title: str
+    id: int
+    blocks: dict
+    links: dict
 
 class MessageModel(BaseModel):
     num: int
