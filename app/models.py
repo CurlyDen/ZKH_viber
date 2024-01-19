@@ -33,11 +33,11 @@ class MessageModel(BaseModel):
     id: str
     scenario_id: int
     title: str
-    text: Optional[str]
+    text: Optional[str] = None
     coords: Dict[str, int]  
     style: Dict[str]
     type: str
-    parentId: Optional[Dict[str]] = None
+    parent_id: Optional[Dict[str]] = None
 
 class KeyModel(BaseModel):
     id: str
