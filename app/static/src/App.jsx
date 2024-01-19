@@ -8,7 +8,6 @@ import axios from "axios";
 const App = () => {
   const [selectedScenario, setSelectedScenario] = useState(0);
   const [scenarios, setScenarios] = useState([]);
-  const [functions, setFunctions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,11 +22,8 @@ const App = () => {
             id: s.id,
             blocks: s.blocks,
             links: s.links,
+            functions: s.functions,
           }));
-
-          const functionsData = response.data;
-
-          setFunctions(functionsData);
           setScenarios(scenarioData);
         } else {
           console.error("Failed to fetch scenarios:", response.statusText);
@@ -40,7 +36,9 @@ const App = () => {
     fetchData();
   }, []);
 
-  console.log(functions);
+  useEffect(() => {
+    console.log(scenarios);
+  }, [scenarios]);
 
   return (
     <BrowserRouter>

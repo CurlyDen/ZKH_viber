@@ -5,6 +5,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import JSON
 
 
 DATABASE_URL = "postgresql+asyncpg://postgres:postgres@pgdb:5432/postgres"
@@ -28,28 +29,36 @@ async def get_session() -> AsyncSession:
 class Message(Base):
     __tablename__ = "messages"
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True, primary_key=True, index=True)
-    num = sqlalchemy.Column(sqlalchemy.Integer)
-    scenario = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
+    id = sqlalchemy.Column(sqlalchemy.String, primary_key=True, index=True)
+    scenario_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
+    title = sqlalchemy.Column(sqlalchemy.String)
     text = sqlalchemy.Column(sqlalchemy.String)
-    func = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    coords = sqlalchemy.Column(sqlalchemy.String)
-    __table_args__ = (UniqueConstraint('num', 'scenario', name='scenario_separate_mess'),)
+    coords = sqlalchemy.Column(JSON)  
+    style = sqlalchemy.Column(JSON)   
+    type = sqlalchemy.Column(sqlalchemy.String)
+    parent_id = sqlalchemy.Column(JSON, nullable=True)  
+    __table_args__ = (UniqueConstraint('title', 'scenario_id', name='scenario_separate_mess'),)
 
 
 class Key(Base):
     __tablename__ = "keys"
     id = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True, primary_key=True, index=True)
-    num = sqlalchemy.Column(sqlalchemy.Numeric)
+    scenario_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
     text = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    start = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('messages.id', ondelete='CASCADE'), nullable=False, index=True)
-    end = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('messages.id', ondelete='CASCADE'), nullable=False, index=True)
-    scenario = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
-    __table_args__ = (UniqueConstraint('num', 'scenario', name='scenario_separate_key'),UniqueConstraint('start', 'text', name='key_unique'))
+    start = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('messages.id', ondelete='CASCADE'), nullable=False, index=True)
+    end = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('messages.id', ondelete='CASCADE'), nullable=False, index=True)
+    type = sqlalchemy.Column(sqlalchemy.String)
+    __table_args__ = (UniqueConstraint('text', 'scenario_id', name='scenario_separate_key'), UniqueConstraint('start', 'text', name='key_unique'))
+
+
 
 
 class Scenario(Base):
     __tablename__ = "scenarios"
     id = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True, primary_key=True, index=True)
     title = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    blocks = sqlalchemy.Column(JSON)  
+    links = sqlalchemy.Column(JSON) 
+    functions = sqlalchemy.Column(JSON)
+
     

@@ -1,5 +1,6 @@
-from pydantic import BaseModel, FilePath, Optional, Dict
-from typing import Literal
+from pydantic import BaseModel, FilePath
+from typing import Literal, Optional
+
 
 # Bot
 class UserModel(BaseModel):
@@ -22,22 +23,17 @@ class ApplicationModel(BaseModel):
 
 
 # Scenario editor
-class ScenarioModel(BaseModel):
-    title: str
-    id: int
-    blocks: list
-    links: list
-    functions: list
+
 
 class MessageModel(BaseModel):
     id: str
     scenario_id: int
     title: str
-    text: Optional[str] = None
-    coords: Dict[str, int]  
-    style: Dict[str]
+    text: Optional[str] = ""
+    coords: dict
+    style: dict
     type: str
-    parent_id: Optional[Dict[str]] = None
+    parent_id: Optional[dict] = None
 
 class KeyModel(BaseModel):
     id: str
@@ -46,3 +42,10 @@ class KeyModel(BaseModel):
     start: str
     end: str
     type: str
+
+class ScenarioModel(BaseModel):
+    id: int
+    title: str
+    blocks: list
+    links: list
+    functions: list
