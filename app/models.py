@@ -1,4 +1,4 @@
-from pydantic import BaseModel, FilePath
+from pydantic import BaseModel, FilePath, Optional, Dict
 from typing import Literal
 
 # Bot
@@ -30,15 +30,19 @@ class ScenarioModel(BaseModel):
     functions: list
 
 class MessageModel(BaseModel):
-    num: int
-    scenario: int
-    text: str
-    func: str
-    coords: str
+    id: str
+    scenario_id: int
+    title: str
+    text: Optional[str]
+    coords: Dict[str, int]  
+    style: Dict[str]
+    type: str
+    parentId: Optional[Dict[str]] = None
 
 class KeyModel(BaseModel):
-    num: int
-    scenario: int
+    id: str
+    scenario_id: int
     text: str
-    start: int
-    end: int
+    start: str
+    end: str
+    type: str

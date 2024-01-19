@@ -8,33 +8,39 @@ import axios from "axios";
 const App = () => {
   const [selectedScenario, setSelectedScenario] = useState(0);
   const [scenarios, setScenarios] = useState([]);
+  const [functions, setFunctions] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         "http://localhost:8000/mc_viber/canvas"
-  //       );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/mc_viber/canvas"
+        );
 
-  //       if (response.status === 200) {
-  //         const scenarioData = response.data.map((s) => ({
-  //           title: s.title,
-  //           id: s.id,
-  //           blocks: s.blocks,
-  //           links: s.links,
-  //         }));
+        if (response.status === 200) {
+          const scenarioData = response.data.map((s) => ({
+            title: s.title,
+            id: s.id,
+            blocks: s.blocks,
+            links: s.links,
+          }));
 
-  //         setScenarios(scenarioData);
-  //       } else {
-  //         console.error("Failed to fetch scenarios:", response.statusText);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error during scenarios fetch:", error.message);
-  //     }
-  //   };
+          const functionsData = response.data;
 
-  //   fetchData();
-  // }, []);
+          setFunctions(functionsData);
+          setScenarios(scenarioData);
+        } else {
+          console.error("Failed to fetch scenarios:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error during scenarios fetch:", error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log(functions);
 
   return (
     <BrowserRouter>
