@@ -71,13 +71,36 @@ const Nodes = ({ scenario, setScenarios }) => {
 
   const handleSave = async () => {
     try {
+      const blocks = nodes.map((n) => ({
+        id: n.id,
+        scenario_id: scenario.id,
+        title: n.data.label,
+        text: n.data.description,
+        coords: n.position,
+        style: n.style,
+        type: n.type,
+        parent_id: n.data.parentId,
+      }));
+
+      const links = edges.map((e) => ({
+        id: e.id,
+        scenario_id: scenario.id,
+        text: e.label,
+        type: e.type,
+        start: e.source,
+        end: e.target,
+      }));
+
+      const scenarioToSave = {
+        id: scenario.id,
+        title: scenario.title,
+        blocks: blocks,
+        links: links,
+        functions: scenario.functions,
+      };
       const response = await axios.post(
-        `http://localhost:8000/mc_viiber/canvas/${scenario.id}`,
-        {
-          blocks: nodes,
-          links: edges,
-          scenario: scenario,
-        },
+        `http://localhost:8000/mc_viber/canvas/${scenario.id}`,
+        scenarioToSave,
         {
           headers: {
             "Content-Type": "application/json",

@@ -26,7 +26,9 @@ class ApplicationModel(BaseModel):
 
 
 class MessageModel(BaseModel):
+    unique_id: str
     id: str
+    unique_id: str
     scenario_id: int
     title: str
     text: Optional[str] = ""
@@ -36,6 +38,7 @@ class MessageModel(BaseModel):
     parent_id: Optional[dict] = None
 
 class KeyModel(BaseModel):
+    unique_id: str
     id: str
     scenario_id: int
     text: str

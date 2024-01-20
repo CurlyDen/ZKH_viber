@@ -40,16 +40,16 @@ async def get_messages(session: AsyncSession, scenario_id: int) -> list[Message]
     result = await session.execute(select(Message).where(Message.scenario_id == scenario_id))
     return result.scalars().all()
 
-async def get_message(session: AsyncSession, scenario_id: int, title: str) -> Message:
-    result = await session.execute(select(Message).where((Message.scenario_id == scenario_id) & (Message.id == id)))
+async def get_message(session: AsyncSession, unique_id: str) -> Message:
+    result = await session.execute(select(Message).where(Message.unique_id == unique_id))
     return result.scalars().first()
 
-async def get_message_by_id(session: AsyncSession, id: str) -> Message:
-    result = await session.execute(select(Message).where(Message.id == id))
+async def get_message_by_id(session: AsyncSession, unique_id: str) -> Message:
+    result = await session.execute(select(Message).where(Message.unique_id == unique_id))
     return result.scalars().first()
 
 async def add_message(session: AsyncSession, id: str, scenario_id: int, title: str, text: str, coords: dict, style: dict, type: str, parent_id: Optional[dict] = None) -> Message:
-    new_message = Message(id=id, scenario_id=scenario_id, title=title, text=text, coords=coords, style=style, type=type, parent_id=parent_id)
+    new_message = Message(unique_id=(id+str(scenario_id)), id=id, scenario_id=scenario_id, title=title, text=text, coords=coords, style=style, type=type, parent_id=parent_id)
     session.add(new_message)
     return new_message
 
@@ -71,27 +71,31 @@ async def get_keys(session: AsyncSession, scenario_id: int) -> list[Key]:
     result = await session.execute(select(Key).where(Key.scenario_id == scenario_id))
     return result.scalars().all()
 
-async def get_keys_by_message(session: AsyncSession, start: int) -> list[Key]:
-    result = await session.execute(select(Key).where(Key.start == start))
+async def get_keys_by_start_message(session: AsyncSession, scenario_id: int, start: str) -> list[Key]:
+    result = await session.execute(select(Key).where((Key.start == start) and (Key.scenario_id == scenario_id)))
     return result.scalars().all()
 
-async def get_key(session: AsyncSession, scenario_id: int, id: int) -> Key:
-    result = await session.execute(select(Key).where((Key.scenario_id == scenario_id) & (Key.id == id)))
+async def get_keys_by_end_message(session: AsyncSession, scenario_id: int, end: str) -> list[Key]:
+    result = await session.execute(select(Key).where((Key.end == end) and (Key.scenario_id == scenario_id)))
+    return result.scalars().all()
+
+async def get_key(session: AsyncSession, unique_id: str) -> Key:
+    result = await session.execute(select(Key).where(Key.unique_id == unique_id))
     return result.scalars().first()
 
-async def add_key(session: AsyncSession, scenario_id: int, text: str, start: int, end: int, type: str) -> Key:
-    new_key = Key(scenario_id=scenario_id, text=text, start=start, end=end, type=type)
+async def add_key(session: AsyncSession, id: str, scenario_id: int, text: str, start: int, end: int, type: str) -> Key:
+    new_key = Key(unique_id=(id+str(scenario_id)), id=id, scenario_id=scenario_id, text=text, start=start, end=end, type=type)
     session.add(new_key)
     return new_key
 
-async def delete_key(session: AsyncSession, id: int) -> None:
-    result = await session.execute(delete(Key).where(Key.id == id))
+async def delete_key(session: AsyncSession, unique_id: str) -> None:
+    result = await session.execute(delete(Key).where(Key.unique_id == unique_id))
     return result
 
 async def delete_keys_of_scenario(session: AsyncSession, scenario_id: int) -> None:
     result = await session.execute(delete(Key).where(Key.scenario_id == scenario_id))
     return result
 
-async def update_key(session: AsyncSession, scenario_id: int, id: int, text: str, start: int, end: int, type: str) -> None:
-    result = await session.execute(update(Key).where((Key.scenario_id == scenario_id) & (Key.id == id)).values(text=text, start=start, end=end, type=type))
+async def update_key(session: AsyncSession, unique_id: str, text: str, start: int, end: int, type: str) -> None:
+    result = await session.execute(update(Key).where(Key.unique_id == unique_id).values(text=text, start=start, end=end, type=type))
     return result

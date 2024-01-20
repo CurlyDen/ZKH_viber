@@ -8,9 +8,11 @@ import axios from "axios";
 const App = () => {
   const [selectedScenario, setSelectedScenario] = useState(0);
   const [scenarios, setScenarios] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(
           "http://localhost:8000/mc_viber/canvas"
@@ -51,6 +53,8 @@ const App = () => {
         }
       } catch (error) {
         console.error("Error during scenarios fetch:", error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -85,6 +89,8 @@ const App = () => {
                 setSelectedScenario={setSelectedScenario}
                 scenarios={scenarios}
                 setScenarios={setScenarios}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
               />
             }
           />

@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
 import asyncio
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,7 +29,8 @@ async def get_session() -> AsyncSession:
 class Message(Base):
     __tablename__ = "messages"
 
-    id = sqlalchemy.Column(sqlalchemy.String, primary_key=True, index=True)
+    id = sqlalchemy.Column(sqlalchemy.String)
+    unique_id = sqlalchemy.Column(sqlalchemy.String, primary_key=True, index=True)
     scenario_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
     title = sqlalchemy.Column(sqlalchemy.String)
     text = sqlalchemy.Column(sqlalchemy.String)
@@ -37,20 +38,24 @@ class Message(Base):
     style = sqlalchemy.Column(JSON)   
     type = sqlalchemy.Column(sqlalchemy.String)
     parent_id = sqlalchemy.Column(JSON, nullable=True)  
-    __table_args__ = (UniqueConstraint('title', 'scenario_id', name='scenario_separate_mess'),)
 
+    __table_args__ = (
+        UniqueConstraint('unique_id', name='unique_message_id'),
+    )
 
 class Key(Base):
     __tablename__ = "keys"
-    id = sqlalchemy.Column(sqlalchemy.Integer, autoincrement=True, primary_key=True, index=True)
+    id = sqlalchemy.Column(sqlalchemy.String)
+    unique_id = sqlalchemy.Column(sqlalchemy.String, primary_key=True, index=True)
     scenario_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
     text = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    start = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('messages.id', ondelete='CASCADE'), nullable=False, index=True)
-    end = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('messages.id', ondelete='CASCADE'), nullable=False, index=True)
+    start = sqlalchemy.Column(sqlalchemy.String, nullable=False, index=True)
+    end = sqlalchemy.Column(sqlalchemy.String, nullable=False, index=True)
     type = sqlalchemy.Column(sqlalchemy.String)
-    __table_args__ = (UniqueConstraint('text', 'scenario_id', name='scenario_separate_key'), UniqueConstraint('start', 'text', name='key_unique'))
 
-
+    __table_args__ = (
+        UniqueConstraint('unique_id', name='unique_key_id'),
+    )
 
 
 class Scenario(Base):
