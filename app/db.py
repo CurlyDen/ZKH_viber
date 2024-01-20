@@ -37,7 +37,7 @@ class Message(Base):
     coords = sqlalchemy.Column(JSON)  
     style = sqlalchemy.Column(JSON)   
     type = sqlalchemy.Column(sqlalchemy.String)
-    parent_id = sqlalchemy.Column(JSON, nullable=True)  
+    parent_id = sqlalchemy.Column(sqlalchemy.String, nullable=True)  
 
     __table_args__ = (
         UniqueConstraint('unique_id', name='unique_message_id'),

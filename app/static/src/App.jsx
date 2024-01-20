@@ -10,56 +10,50 @@ const App = () => {
   const [scenarios, setScenarios] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(
-          "http://localhost:8000/mc_viber/canvas"
-        );
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get("http://localhost:8000/mc_viber/canvas");
 
-        if (response.status === 200) {
-          const scenarioData = response.data.map((s) => ({
-            title: s.title,
-            id: s.id,
-            nodes: s.blocks.map((b) => {
-              return {
-                id: b.id,
-                data: {
-                  label: b.title,
-                  description: b.text,
-                  parentId: b.parent_id,
-                },
-                position: b.coords,
-                type: b.type,
-                style: b.style,
-              };
-            }),
-            edges: s.links.map((l) => {
-              return {
-                id: l.id,
-                label: l.text,
-                parentId: l.parent_id,
-                source: l.start,
-                target: l.end,
-                type: l.type,
-              };
-            }),
-            functions: s.functions,
-          }));
-          setScenarios(scenarioData);
-        } else {
-          console.error("Failed to fetch scenarios:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error during scenarios fetch:", error.message);
-      } finally {
-        setIsLoading(false);
+      if (response.status === 200) {
+        const scenarioData = response.data.map((s) => ({
+          title: s.title,
+          id: s.id,
+          nodes: s.blocks.map((b) => {
+            return {
+              id: b.id,
+              data: {
+                label: b.title,
+                description: b.text,
+                parentId: b.parent_id,
+              },
+              position: b.coords,
+              type: b.type,
+              style: b.style,
+            };
+          }),
+          edges: s.links.map((l) => {
+            return {
+              id: l.id,
+              label: l.text,
+              parentId: l.parent_id,
+              source: l.start,
+              target: l.end,
+              type: l.type,
+            };
+          }),
+          functions: s.functions,
+        }));
+        setScenarios(scenarioData);
+      } else {
+        console.error("Failed to fetch scenarios:", response.statusText);
       }
-    };
-
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error("Error during scenarios fetch:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     console.log(scenarios);
@@ -91,6 +85,7 @@ const App = () => {
                 setScenarios={setScenarios}
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
+                fetchData={fetchData}
               />
             }
           />

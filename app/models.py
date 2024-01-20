@@ -35,7 +35,7 @@ class MessageModel(BaseModel):
     coords: dict
     style: dict
     type: str
-    parent_id: Optional[dict] = None
+    parent_id: Optional[str] = None
 
 class KeyModel(BaseModel):
     unique_id: str

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 const Menu = ({
@@ -9,8 +9,11 @@ const Menu = ({
   scenarios,
   isLoading,
   setIsLoading,
+  fetchData,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const handleScenarioClick = async (scenario) => {
     setIsLoading(true);
 
@@ -67,11 +70,6 @@ const Menu = ({
       setIsLoading(true);
       axios
         .post("http://localhost:8000/mc_viber/canvas", newScenario)
-        .then((response) => {
-          const createdScenario = response.data;
-
-          setScenarios((prevScenarios) => [...prevScenarios, createdScenario]);
-        })
         .catch((error) => {
           console.error("Failed to create scenario:", error.message);
         })
@@ -80,50 +78,9 @@ const Menu = ({
     fetchData();
   };
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get("http://localhost:8000/mc_viber/canvas");
-
-      if (response.status === 200) {
-        const scenarioData = response.data.map((s) => ({
-          title: s.title,
-          id: s.id,
-          nodes: s.blocks.map((b) => {
-            return {
-              id: b.id,
-              data: {
-                label: b.title,
-                description: b.text,
-                parentId: b.parent_id,
-              },
-              position: b.coords,
-              type: b.type,
-              style: b.style,
-            };
-          }),
-          edges: s.links.map((l) => {
-            return {
-              id: l.id,
-              label: l.text,
-              parentId: l.parent_id,
-              source: l.start,
-              target: l.end,
-              type: l.type,
-            };
-          }),
-          functions: s.functions,
-        }));
-        setScenarios(scenarioData);
-      } else {
-        console.error("Failed to fetch scenarios:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error during scenarios fetch:", error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (location.pathname === "/") fetchData();
+  }, [location.pathname]);
 
   return (
     <div className="h-screen w-full bg-slate-300 flex flex-col items-center gap-2">
