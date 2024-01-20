@@ -67,9 +67,11 @@ async def get_scenarios(session: AsyncSession = Depends(get_session)):
 
 @app.post("/mc_viber/canvas")
 async def add_scenario(scenario: ScenarioModel, session: AsyncSession = Depends(get_session)):
-    scenario = await db_utility.add_scenario(session, scenario)
-
+    scenario = await db_utility.add_scenario(session, scenario, functions)
     try:
+        await session.commit()
+        start_message = await db_utility.add_message(session, scenario.blocks[0]["id"], scenario.id, scenario.blocks[0]["title"], scenario.blocks[0]["text"], scenario.blocks[0]["coords"], scenario.blocks[0]["style"], scenario.blocks[0]["type"], scenario.blocks[0]["parent_id"])
+        end_message = await db_utility.add_message(session, scenario.blocks[1]["id"], scenario.id, scenario.blocks[1]["title"], scenario.blocks[1]["text"], scenario.blocks[1]["coords"], scenario.blocks[1]["style"], scenario.blocks[1]["type"], scenario.blocks[1]["parent_id"])
         await session.commit()
         return scenario 
     except IntegrityError as ex:

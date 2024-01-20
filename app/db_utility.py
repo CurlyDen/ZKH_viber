@@ -13,13 +13,13 @@ async def get_scenario(session: AsyncSession, id: int) -> Scenario:
     result = await session.execute(select(Scenario).where(Scenario.id==id))
     return result.scalars().first()
 
-async def add_scenario(session: AsyncSession, scenario: Scenario):
+async def add_scenario(session: AsyncSession, scenario: Scenario, functions: list):
     new_scenario = Scenario(
         id=scenario.id,
         title=scenario.title,
         blocks=scenario.blocks,
         links=scenario.links,
-        functions=scenario.functions
+        functions=functions
     )
 
     session.add(new_scenario)
