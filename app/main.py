@@ -66,8 +66,8 @@ async def get_scenarios(session: AsyncSession = Depends(get_session)):
 
 
 @app.post("/mc_viber/canvas")
-async def add_scenario(scenario: ScenarioModel, session: AsyncSession = Depends(get_session)): 
-    session.add(scenario)
+async def add_scenario(scenario: ScenarioModel, session: AsyncSession = Depends(get_session)):
+    scenario = await db_utility.add_scenario(session, scenario)
 
     try:
         await session.commit()
