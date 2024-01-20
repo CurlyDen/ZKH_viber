@@ -64,6 +64,8 @@ const Nodes = ({ scenario, setScenarios }) => {
     setSelectedNode,
   } = useNodesContext();
 
+  const [selectedFunction, setSelectedFunction] = useState("");
+  const functions = scenario?.functions;
   const [nodeName, setNodeName] = useState("");
   const [nodeBg, setNodeBg] = useState("");
   const [edgeLabel, setEdgeLabel] = useState("");
@@ -229,13 +231,13 @@ const Nodes = ({ scenario, setScenarios }) => {
     } = reactFlowInstance.toObject().viewport;
 
     const newNode = {
-      id: (nodes.length + 1).toString(),
+      id: (nodes.length - 2).toString(),
       type: "custom",
       position: {
         x: (Math.random() * 600 - offsetX) / zoom,
         y: (Math.random() * 600 - offsetY) / zoom,
       },
-      data: { label: `Блок ${nodes.length - 2 + 1}`, description: "" },
+      data: { label: scenario.functions[0], description: "" },
       style: { backgroundColor: "#ffffff" },
     };
 
@@ -251,6 +253,8 @@ const Nodes = ({ scenario, setScenarios }) => {
     setSelectedEdge(edge);
     setSelectedNode(null);
   };
+
+  console.log(nodes);
 
   return (
     <ReactFlow
@@ -300,11 +304,17 @@ const Nodes = ({ scenario, setScenarios }) => {
       {selectedNode && (
         <div className="absolute right-2 top-2 z-50 text-sm flex flex-col bg-slate-400 border border-slate-300 bg-opacity-30">
           <label className="font-medium">Имя блока:</label>
-          <input
+          <select
             value={nodeName}
-            className="p-1"
             onChange={(e) => setNodeName(e.target.value)}
-          />
+            className="p-1"
+          >
+            {functions.map((func, index) => (
+              <option key={index} value={func}>
+                {func}
+              </option>
+            ))}
+          </select>
 
           <label className="font-medium">Фон:</label>
           <input

@@ -1,27 +1,35 @@
 import { Handle, Position, useStore } from "reactflow";
 import styles from "./CustomNode.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNodesContext } from "../../context/NodeContext";
 import DeleteNodeButton from "../DeleteNodeButton";
 
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
 
-const functionOptions = [
-  { id: "func1", label: "Function 1" },
-  { id: "func2", label: "Function 2" },
-  { id: "func3", label: "Function 3" },
-];
-
 export default function CustomNode({ id, data, xPos, yPos }) {
   const connectionNodeId = useStore(connectionNodeIdSelector);
-  const { nodes, setNodes, setNodeDesc, edges, setEdges } = useNodesContext();
+  const {
+    nodes,
+    setNodes,
+    setNodeDesc,
+    edges,
+    setEdges,
+    selectedNode,
+    scenario,
+  } = useNodesContext();
   const isConnecting = !!connectionNodeId;
   const isTarget = connectionNodeId && connectionNodeId !== id;
-
+  const [functionCounter, setFunctionCounter] = useState(
+    nodes.filter((n) => n.id.startsWith(`${id}-tree`)).length + 1 || 1
+  );
   const [textareaHeight, setTextareaHeight] = useState("auto");
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [childNodesCreated, setChildNodesCreated] = useState(false);
+
+  const functionOptions = scenario?.functions.map((f, id) => {
+    return { id: "func" + id.toString(), label: f };
+  });
 
   useEffect(() => {
     const parentNode = nodes.find((node) => node.id === id);
@@ -41,8 +49,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
       setEdges(updatedEdges);
     }
   }, [nodes, id]);
-
-  useEffect(() => {}, [selectedOptions]);
 
   useEffect(() => {
     const functionNodes = nodes.filter(
@@ -81,12 +87,13 @@ export default function CustomNode({ id, data, xPos, yPos }) {
   const handleCloseContextMenu = () => {
     setContextMenuVisible(false);
     createChildNodes();
+    setSelectedOptions([]); // Clear selectedOptions when closing the menu
   };
 
   const handleMenuItemClick = (menuItem) => {
-    if (selectedOptions.includes(menuItem)) {
+    if (selectedOptions.some((option) => option.id === menuItem.id)) {
       setSelectedOptions(
-        selectedOptions.filter((option) => option !== menuItem)
+        selectedOptions.filter((option) => option.id !== menuItem.id)
       );
     } else {
       setSelectedOptions([...selectedOptions, menuItem]);
@@ -99,22 +106,18 @@ export default function CustomNode({ id, data, xPos, yPos }) {
     if (parentNode) {
       const parentTreeId = `${id}-tree`;
 
-      const newNodes = selectedOptions
-        .filter((option) => {
-          // Check if a node with the same ID already exists
-          const nodeId = `${parentTreeId}-${option}`;
-          return !nodes.find((node) => node.id === nodeId);
-        })
-        .map((option, index) => ({
-          id: `${parentTreeId}-${option}`,
-          type: "function",
-          position: {
-            x: xPos,
-            y: yPos + 100 + index * 55,
-          },
-          style: { backgroundColor: "#ffffff" },
-          data: { label: option, parentId: id },
-        }));
+      const newNodes = selectedOptions.map((option) => ({
+        id: `${parentTreeId}-${option.id}-${functionCounter}`,
+        type: "function",
+        position: {
+          x: xPos,
+          y: yPos + 100 + (functionCounter - 1) * 55,
+        },
+        style: { backgroundColor: "#ffffff" },
+        data: { label: option.label, parentId: id },
+      }));
+
+      setFunctionCounter(functionCounter + 1); // Increment the counter
 
       setNodes((nds) => [...nds, ...newNodes]);
     }
@@ -144,7 +147,11 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         id={`textarea-${id}`}
         value={data.description}
         onChange={handleTextareaChange}
-        style={{ height: textareaHeight }}
+        style={
+          selectedNode?.id === id
+            ? { height: textareaHeight }
+            : { height: "42px" }
+        }
         className="border-2 border-t-0 border-zinc-700 rounded-[10px] min-h-[42px] rounded-t-none w-full cursor-pointer text-sm px-1 outline-none resize-none overflow-hidden"
       />
 
@@ -158,8 +165,10 @@ export default function CustomNode({ id, data, xPos, yPos }) {
               <input
                 type="checkbox"
                 id={option.id}
-                checked={selectedOptions.includes(option.id)}
-                onChange={() => handleMenuItemClick(option.id)}
+                checked={selectedOptions.some(
+                  (selectedOption) => selectedOption.id === option.id
+                )}
+                onChange={() => handleMenuItemClick(option)}
                 className="mr-1"
                 disabled={childNodesCreated}
               />
@@ -173,7 +182,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
             }`}
             disabled={childNodesCreated}
           >
-            OK
+            Добавить
           </button>
         </div>
       )}

@@ -24,6 +24,7 @@ export const NodesProvider = ({ children, scenario }) => {
         setSelectedNode,
         selectedEdge,
         setSelectedEdge,
+        scenario,
       }}
     >
       {children}

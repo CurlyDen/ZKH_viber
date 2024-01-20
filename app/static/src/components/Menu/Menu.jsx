@@ -25,7 +25,7 @@ const Menu = ({
       if (response.status === 200) {
         const scenarioData = response.data;
         console.log(response.data);
-        await setSelectedScenario(scenarioData);
+        setSelectedScenario(scenarioData);
         navigate(`/canvas/${scenario.id}`);
       } else {
         console.error("Failed to fetch scenario data:", response.statusText);
@@ -41,7 +41,7 @@ const Menu = ({
     if (scenarios?.length < 8) {
       const newScenario = {
         id: scenarios?.length || 0,
-        title: "scenario " + (scenarios?.length + 1 || 1).toString(),
+        title: "Сценарий " + (scenarios?.length + 1 || 1).toString(),
         blocks: [
           {
             id: "-1",
@@ -73,9 +73,11 @@ const Menu = ({
         .catch((error) => {
           console.error("Failed to create scenario:", error.message);
         })
-        .finally(() => setIsLoading(false));
+        .finally(() => {
+          setIsLoading(false);
+          fetchData();
+        });
     }
-    fetchData();
   };
 
   useEffect(() => {

@@ -21,7 +21,7 @@ num_format = re.compile("^[\-]?[1-9][0-9]*\.?[0-9]+$")
 
 app = FastAPI(docs_url="/mc_viber/docs", redoc_url="/mc_viber/redoc")
 
-functions = ['Считать']
+functions = ['Считать', 'Вычислить', 'Отобразить', 'Сравнить', 'Преобразовать', 'Сохранить'];
 
 app.add_middleware(
     CORSMiddleware,
