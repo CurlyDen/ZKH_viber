@@ -20,8 +20,29 @@ const App = () => {
           const scenarioData = response.data.map((s) => ({
             title: s.title,
             id: s.id,
-            blocks: s.blocks,
-            links: s.links,
+            nodes: s.blocks.map((b) => {
+              return {
+                id: b.id,
+                data: {
+                  label: b.title,
+                  description: b.text,
+                  parentId: b.parent_id,
+                },
+                position: b.coords,
+                type: b.type,
+                style: b.style,
+              };
+            }),
+            edges: s.links.map((l) => {
+              return {
+                id: l.id,
+                label: l.text,
+                parentId: l.parent_id,
+                source: l.start,
+                target: l.end,
+                type: l.type,
+              };
+            }),
             functions: s.functions,
           }));
           setScenarios(scenarioData);
