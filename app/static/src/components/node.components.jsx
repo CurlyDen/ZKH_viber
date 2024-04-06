@@ -64,7 +64,6 @@ const Nodes = ({ scenario, setScenarios }) => {
     setSelectedNode,
   } = useNodesContext();
 
-  const [selectedFunction, setSelectedFunction] = useState("");
   const functions = scenario?.functions;
   const [nodeName, setNodeName] = useState("");
   const [nodeBg, setNodeBg] = useState("");
@@ -119,10 +118,6 @@ const Nodes = ({ scenario, setScenarios }) => {
       console.error("Error during scenario save:", error.message);
     }
   };
-
-  useEffect(() => {
-    console.log(scenario);
-  }, [scenario]);
 
   const onInit = (reactFlowInstance) => {
     // Save the ReactFlow instance to access pan and zoom values
@@ -192,8 +187,11 @@ const Nodes = ({ scenario, setScenarios }) => {
       setNodeBg(selectedNode?.style?.backgroundColor);
       setNodeDesc(selectedNode?.data.description);
     }
-    console.log(nodes);
   }, [selectedNode]);
+
+  useEffect(() => {
+    console.log(edges);
+  }, [edges]);
 
   useEffect(() => {
     if (selectedEdge) {
@@ -209,9 +207,7 @@ const Nodes = ({ scenario, setScenarios }) => {
         return;
       }
 
-      const isSourceConnected = edges.some((edge) => edge.source === source);
-
-      if (isSourceConnected) {
+      if (source === "-1" && edges.some((edge) => edge.source === "-1")) {
         return;
       }
 
@@ -302,19 +298,23 @@ const Nodes = ({ scenario, setScenarios }) => {
         </button>
       </div>
       {selectedNode && (
-        <div className="absolute right-2 top-2 z-50 text-sm flex flex-col bg-slate-400 border border-slate-300 bg-opacity-30">
-          <label className="font-medium">Имя блока:</label>
-          <select
-            value={nodeName}
-            onChange={(e) => setNodeName(e.target.value)}
-            className="p-1"
-          >
-            {functions.map((func, index) => (
-              <option key={index} value={func}>
-                {func}
-              </option>
-            ))}
-          </select>
+        <div className="absolute right-2 top-2 z-50 text-sm flex flex-col bg-slate-200 border border-slate-300">
+          {!selectedNode.id.includes("tree") && (
+            <div className="flex flex-col">
+              <label className="font-medium">Имя блока:</label>
+              <select
+                value={nodeName}
+                onChange={(e) => setNodeName(e.target.value)}
+                className="p-1"
+              >
+                {functions.map((func, index) => (
+                  <option key={index} value={func}>
+                    {func}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <label className="font-medium">Фон:</label>
           <input

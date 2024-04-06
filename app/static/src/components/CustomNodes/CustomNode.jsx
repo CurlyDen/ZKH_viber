@@ -3,6 +3,8 @@ import styles from "./CustomNode.module.css";
 import { useState, useEffect, useContext } from "react";
 import { useNodesContext } from "../../context/NodeContext";
 import DeleteNodeButton from "../DeleteNodeButton";
+import { Md2KPlus, MdPlusOne } from "react-icons/md";
+import { TiPlus } from "react-icons/ti";
 
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
 
@@ -23,8 +25,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
     nodes.filter((n) => n.id.startsWith(`${id}-tree`)).length + 1 || 1
   );
   const [textareaHeight, setTextareaHeight] = useState("auto");
-  const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState([]);
+
   const [childNodesCreated, setChildNodesCreated] = useState(false);
 
   const functionOptions = scenario?.functions.map((f, id) => {
@@ -56,7 +57,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
     );
     const otherNodes = nodes.filter((node, index) => node.data.parentId !== id);
     const updatedFunctionNodes = functionNodes?.map((node, index) => {
-      return { ...node, position: { x: xPos, y: yPos + 100 + index * 55 } };
+      return { ...node, position: { x: xPos, y: yPos + 104 + index * 55 } };
     });
 
     setNodes([...otherNodes, ...updatedFunctionNodes]);
@@ -79,25 +80,13 @@ export default function CustomNode({ id, data, xPos, yPos }) {
     setTextareaHeight(`${e.target.scrollHeight}px`);
   };
 
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    setContextMenuVisible(!contextMenuVisible);
-  };
-
-  const handleCloseContextMenu = () => {
-    setContextMenuVisible(false);
+  const handleClick = () => {
     createChildNodes();
-    setSelectedOptions([]); // Clear selectedOptions when closing the menu
   };
 
-  const handleMenuItemClick = (menuItem) => {
-    if (selectedOptions.some((option) => option.id === menuItem.id)) {
-      setSelectedOptions(
-        selectedOptions.filter((option) => option.id !== menuItem.id)
-      );
-    } else {
-      setSelectedOptions([...selectedOptions, menuItem]);
-    }
+  const onNodeDragStart = (event, node) => {
+    // Prevent node dragging
+    return false;
   };
 
   const createChildNodes = () => {
@@ -106,28 +95,27 @@ export default function CustomNode({ id, data, xPos, yPos }) {
     if (parentNode) {
       const parentTreeId = `${id}-tree`;
 
-      const newNodes = selectedOptions.map((option) => ({
-        id: `${parentTreeId}-${option.id}-${functionCounter}`,
+      const newNodes = {
+        id: `${parentTreeId}-${functionCounter}`,
         type: "function",
         position: {
           x: xPos,
-          y: yPos + 100 + (functionCounter - 1) * 55,
+          y: yPos + 104 + (functionCounter - 1) * 55,
         },
         style: { backgroundColor: "#ffffff" },
-        data: { label: option.label, parentId: id },
-      }));
-
+        data: { label: "", parentId: id },
+      };
       setFunctionCounter(functionCounter + 1); // Increment the counter
 
-      setNodes((nds) => [...nds, ...newNodes]);
+      setNodes((nds) => [...nds, newNodes]);
     }
   };
 
   return (
-    <div className={styles.customNode} onContextMenu={handleContextMenu}>
+    <div className={styles.customNode}>
       <div className={styles.customNodeBody}>
         <DeleteNodeButton nodeId={id} />
-        {!isConnecting && !selectedOptions.length && (
+        {!isConnecting && (
           <Handle
             className={styles.customHandle}
             position={Position.Right}
@@ -155,37 +143,12 @@ export default function CustomNode({ id, data, xPos, yPos }) {
         className="border-2 border-t-0 border-zinc-700 rounded-[10px] min-h-[42px] rounded-t-none w-full cursor-pointer text-sm px-1 outline-none resize-none overflow-hidden"
       />
 
-      {contextMenuVisible && (
-        <div
-          className={`absolute bg-white border border-gray-300 rounded-md shadow p-2 z-[1000] left-full w-48`}
-          onClick={(e) => e.stopPropagation()} // Prevent closing on click within the context menu
-        >
-          {functionOptions.map((option) => (
-            <div key={option.id} className="mb-2">
-              <input
-                type="checkbox"
-                id={option.id}
-                checked={selectedOptions.some(
-                  (selectedOption) => selectedOption.id === option.id
-                )}
-                onChange={() => handleMenuItemClick(option)}
-                className="mr-1"
-                disabled={childNodesCreated}
-              />
-              <label htmlFor={option.id}>{option.label}</label>
-            </div>
-          ))}
-          <button
-            onClick={handleCloseContextMenu}
-            className={`w-full bg-green-400 p-1 rounded-md ${
-              childNodesCreated ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={childNodesCreated}
-          >
-            Добавить
-          </button>
-        </div>
-      )}
+      <button
+        onClick={handleClick}
+        className="text-center flex items-center justify-center text-sm w-[20px] h-[12px] border-[#222138] border-2 bg-green-400 absolute z-[10000] left-1/2 -translate-x-1/2 -bottom-[8px]"
+      >
+        <TiPlus size={12} />
+      </button>
     </div>
   );
 }

@@ -7,6 +7,7 @@ const DeleteNodeButton = ({ nodeId }) => {
     useNodesContext();
 
   const handleClick = (e) => {
+    e.preventDefault();
     const updatedNodes = nodes.filter(
       (node) => node.id !== nodeId && node.data.parentId !== nodeId
     );
