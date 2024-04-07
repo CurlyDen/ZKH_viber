@@ -11,6 +11,11 @@ const StartNode = ({ data }) => {
           position={Position.Right}
           type="source"
         />
+        <Handle
+          className={styles.customHandle}
+          position={Position.Left}
+          type="target"
+        />
         {data.label}
       </div>
     </div>
