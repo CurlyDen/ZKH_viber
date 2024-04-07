@@ -84,11 +84,6 @@ export default function CustomNode({ id, data, xPos, yPos }) {
     createChildNodes();
   };
 
-  const onNodeDragStart = (event, node) => {
-    // Prevent node dragging
-    return false;
-  };
-
   const createChildNodes = () => {
     const parentNode = nodes.find((node) => node.id === id);
 

@@ -71,9 +71,9 @@ const FunctionNode = ({ id, data }) => {
   };
 
   return (
-    <div className={styles.functionNode}>
+    <div className={`${styles.functionNode} nodrag`}>
       <div
-        className={styles.endpointNodeBody}
+        className={`${styles.endpointNodeBody} nodrag`}
         onContextMenu={handleContextMenu}
       >
         <DeleteNodeButton nodeId={id} onDelete={handleDelete} />
@@ -94,7 +94,7 @@ const FunctionNode = ({ id, data }) => {
             onChange={handleTextareaChange}
             onBlur={handleBlur}
             spellCheck={false}
-            className="h-10 mr-[10px] w-full bg-transparent cursor-pointer text-sm px-1 outline-none resize-none overflow-hidden break-words"
+            className="nodrag h-10 mr-[10px] w-full bg-transparent cursor-pointer text-sm px-1 outline-none resize-none overflow-hidden break-words"
           />
         ) : (
           <div className="w-full mr-[10px] bg-transparent h-10 cursor-pointer text-sm px-1 text-ellipsis overflow-hidden break-words">
