@@ -21,6 +21,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
   } = useNodesContext();
   const isConnecting = !!connectionNodeId;
   const isTarget = connectionNodeId && connectionNodeId !== id;
+
   const [functionCounter, setFunctionCounter] = useState(
     nodes.filter((n) => n.id.startsWith(`${id}-tree`)).length + 1 || 1
   );
@@ -31,6 +32,12 @@ export default function CustomNode({ id, data, xPos, yPos }) {
   const functionOptions = scenario?.functions.map((f, id) => {
     return { id: "func" + id.toString(), label: f };
   });
+
+  useEffect(() => {
+    setFunctionCounter(
+      nodes.filter((n) => n.id.startsWith(`${id}-tree`)).length + 1 || 1
+    );
+  }, [nodes.length]);
 
   useEffect(() => {
     const parentNode = nodes.find((node) => node.id === id);
@@ -115,6 +122,7 @@ export default function CustomNode({ id, data, xPos, yPos }) {
             className={styles.customHandle}
             position={Position.Right}
             type="source"
+            isConnectableStart={functionCounter === 1}
           />
         )}
         <Handle
