@@ -1,13 +1,30 @@
 services:
-  api:
+  api_front:
+    build: /app/static
     depends_on:
+      - api
+    # command: serve -s build -l 3000
+    restart: unless-stopped
+    labels: # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.zkh_front.rule=Host(`localhost`) && PathPrefix(`/mc_viber`)"
+      - "traefik.http.routers.zkh_front.service=api_front"
+      - "traefik.http.routers.zkh_front.middlewares=api_front-stripprefix"
+      - "traefik.http.services.api_front.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.api_front-stripprefix.stripprefix.prefixes=/mc_viber,/mc_viber/"
+
+
+  api:
+    build: /app
+    depends_on:
+      - traefik
       - pgdb
-    build: ./app
-    environment:
-      PORT: 8000
-    ports:
-      - "8000:8000"
-    # restart: always
+    restart: always
+    expose:
+      - 8000
+    labels: # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.zkh.rule=Host(`localhost`) && PathPrefix(`/api_mc`)"
 
   pgdb:
     # Использование готового образа postgres
