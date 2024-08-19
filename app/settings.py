@@ -1,4 +1,4 @@
-URL = "app3.fundeus.bg/api_mc"
+URL = "domain.com/api_mc"
 
 VIBER_SCENARIO = {
     0: "viber_token",    
