@@ -13,7 +13,7 @@ const App = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("https://app3.fundeus.bg/api_mc/canvas");
+      const response = await axios.get("https://domain.com/api_mc/canvas");
 
       if (response.status === 200) {
         const scenarioData = response.data.map((s) => ({
