@@ -12,6 +12,6 @@ export default defineConfig({
     port: 80,
     strictPort: true,
     host: true,
-    origin: "https://app3.fundeus.bg/api_mc",
+    origin: "https://domain.com/api_mc",
   },
 });
