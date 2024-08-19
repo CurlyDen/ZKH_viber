@@ -1,4 +1,4 @@
-import sqlalchemy
+import sqlalchemy, enum
 from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
 import asyncio
 from sqlalchemy.orm import declarative_base
@@ -24,6 +24,14 @@ async def init_models():
 async def get_session() -> AsyncSession:
     async with async_session() as session:
         yield session
+
+
+class MyEnum(enum.Enum):
+    user = 0
+    clean = 1
+    security = 2
+    service = 3
+    admin = 4
 
 
 class Message(Base):
@@ -66,4 +74,11 @@ class Scenario(Base):
     links = sqlalchemy.Column(JSON) 
     functions = sqlalchemy.Column(JSON)
 
+
+class User(Base):
+    __tablename__ = "users"
+    id = sqlalchemy.Column(sqlalchemy.String, primary_key=True, index=True)
+    foreign_id = sqlalchemy.Column(sqlalchemy.String)
+    role = sqlalchemy.Column(sqlalchemy.Enum(MyEnum))
+    scenario_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('scenarios.id', ondelete='CASCADE'), nullable=False, index=True)
     

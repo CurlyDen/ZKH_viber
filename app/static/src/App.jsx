@@ -13,7 +13,7 @@ const App = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/mc_viber/canvas");
+      const response = await axios.get("https://app3.fundeus.bg/api_mc/canvas");
 
       if (response.status === 200) {
         const scenarioData = response.data.map((s) => ({
@@ -66,7 +66,7 @@ const App = () => {
           {scenarios?.map((scenario) => (
             <Route
               key={scenario.id}
-              path={`/canvas/${scenario.id}`}
+              path={`/mc_viber/canvas/${scenario.id}`}
               element={
                 <NodesProvider scenario={scenario}>
                   <Nodes scenario={scenario} setScenarios={setScenarios} />
@@ -76,7 +76,7 @@ const App = () => {
           ))}
 
           <Route
-            path="/"
+            path="/mc_viber"
             element={
               <Menu
                 selectedScenario={selectedScenario}

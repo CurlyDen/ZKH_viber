@@ -1,15 +1,21 @@
-FROM node:21-alpine
+FROM node as builder
+WORKDIR /usr/src/app
+COPY package.json /usr/src/app/
+COPY package-lock.json /usr/src/app/
 
-WORKDIR /app/static
-
-COPY package.json .
-
-RUN npm install
-
-COPY . .
-
+#RUN npm install --global serve
+RUN npm i
+RUN npm install react-scripts@latest --legacy-peer-deps -S serve
+# RUN npm audit fix --force
+COPY src /usr/src/app/src
+COPY public /usr/src/app/public
+COPY index.html /usr/src/app/
+COPY *.js /usr/src/app/
 RUN npm run build
 
-EXPOSE 8080
+FROM nginx:1.25.1-bookworm
 
-CMD [ "npm", "run", "preview" ]
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+RUN chown -R nginx:nginx /usr/share/nginx/html
+RUN ls -lla /usr/share/nginx/html
+EXPOSE 80

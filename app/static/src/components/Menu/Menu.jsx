@@ -19,14 +19,14 @@ const Menu = ({
 
     try {
       const response = await axios.get(
-        `http://localhost:8000/mc_viber/canvas/${scenario.id}`
+        `https://app3.fundeus.bg/api_mc/canvas/${scenario.id}`
       );
 
       if (response.status === 200) {
         const scenarioData = response.data;
         console.log(response.data);
         setSelectedScenario(scenarioData);
-        navigate(`/canvas/${scenario.id}`);
+        navigate(`/mc_viber/canvas/${scenario.id}`);
       } else {
         console.error("Failed to fetch scenario data:", response.statusText);
       }
@@ -69,7 +69,7 @@ const Menu = ({
       };
       setIsLoading(true);
       axios
-        .post("http://localhost:8000/mc_viber/canvas", newScenario)
+        .post("https://app3.fundeus.bg/api_mc/canvas", newScenario)
         .catch((error) => {
           console.error("Failed to create scenario:", error.message);
         })
@@ -81,7 +81,7 @@ const Menu = ({
   };
 
   useEffect(() => {
-    if (location.pathname === "/") fetchData();
+    if (location.pathname === "/mc_viber") fetchData();
   }, [location.pathname]);
 
   return (

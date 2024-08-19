@@ -100,7 +100,7 @@ const Nodes = ({ scenario, setScenarios }) => {
         functions: scenario.functions,
       };
       const response = await axios.post(
-        `http://localhost:8000/mc_viber/canvas/${scenario.id}`,
+        `https://app3.fundeus.bg/api_mc/canvas/${scenario.id}`,
         scenarioToSave,
         {
           headers: {
@@ -280,7 +280,7 @@ const Nodes = ({ scenario, setScenarios }) => {
       <div className="absolute z-50 flex gap-2 bg-slate-300 p-1 rounded-br-lg">
         <Link
           className=" bg-orange-400 transition-all hover:bg-yellow-400 text-white font-bold py-1 px-3 rounded"
-          to="/"
+          to="/mc_viber"
         >
           <MdHome size={28} />
         </Link>
