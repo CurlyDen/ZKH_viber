@@ -56,8 +56,8 @@ const App = () => {
   };
 
   useEffect(() => {
-    console.log(scenarios);
-  }, [scenarios]);
+    fetchData();
+  }, []); 
 
   return (
     <BrowserRouter>
