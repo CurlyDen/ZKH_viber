@@ -32,12 +32,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# @app.on_event("startup")
-# async def startup_event():
-    # print(sethook())
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.drop_all)
-    #     await conn.run_sync(Base.metadata.create_all)
+@app.on_event("startup")
+async def startup_event():
+    print(sethook())
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 @app.get("/api_mc/messages/{id}", response_model=list[MessageModel])
 async def get_messages(id: int, status_code=200, session: AsyncSession = Depends(get_session)):

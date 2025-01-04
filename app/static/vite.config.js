@@ -12,6 +12,6 @@ export default defineConfig({
     port: 80,
     strictPort: true,
     host: true,
-    origin: "https://domain.com/api_mc",
+    origin: "http://localhost:8000/api_mc",
   },
 });
