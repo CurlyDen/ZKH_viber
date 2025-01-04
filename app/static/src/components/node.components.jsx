@@ -70,6 +70,15 @@ const Nodes = ({ scenario, setScenarios }) => {
   const [edgeLabel, setEdgeLabel] = useState("");
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
+  const generateUniqueNodeId = () => {
+    const existingIds = nodes.map(node => {
+      const numericId = parseInt(node.id);
+      return !isNaN(numericId) ? numericId : -999;
+    });
+    const maxId = Math.max(...existingIds, 0);
+    return (maxId + 1).toString();
+  };
+
   const handleSave = async () => {
     try {
       const blocks = nodes.map((n) => ({
@@ -120,7 +129,6 @@ const Nodes = ({ scenario, setScenarios }) => {
   };
 
   const onInit = (reactFlowInstance) => {
-    // Save the ReactFlow instance to access pan and zoom values
     setReactFlowInstance(reactFlowInstance);
   };
 
@@ -190,10 +198,6 @@ const Nodes = ({ scenario, setScenarios }) => {
   }, [selectedNode]);
 
   useEffect(() => {
-    console.log(edges);
-  }, [edges]);
-
-  useEffect(() => {
     if (selectedEdge) {
       setEdgeLabel(selectedEdge?.label);
     }
@@ -219,7 +223,6 @@ const Nodes = ({ scenario, setScenarios }) => {
   const onCreateNode = () => {
     if (!reactFlowInstance) return;
 
-    // Get the current pan and zoom values
     const {
       x: offsetX,
       y: offsetY,
@@ -227,7 +230,7 @@ const Nodes = ({ scenario, setScenarios }) => {
     } = reactFlowInstance.toObject().viewport;
 
     const newNode = {
-      id: (nodes.length - 2).toString(),
+      id: generateUniqueNodeId(),
       type: "custom",
       position: {
         x: (Math.random() * 600 - offsetX) / zoom,
@@ -249,8 +252,6 @@ const Nodes = ({ scenario, setScenarios }) => {
     setSelectedEdge(edge);
     setSelectedNode(null);
   };
-
-  console.log(nodes);
 
   return (
     <ReactFlow
