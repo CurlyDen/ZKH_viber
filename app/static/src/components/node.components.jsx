@@ -4,10 +4,7 @@ import ReactFlow, {
   MiniMap,
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
   addEdge,
-  updateEdge,
   MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -52,7 +49,7 @@ const Nodes = ({ scenario, setScenarios }) => {
   const {
     nodes,
     setNodes,
-    onNodesChange,
+    onNodesChange: contextOnNodesChange,
     nodeDesc,
     setNodeDesc,
     edges,
@@ -203,6 +200,44 @@ const Nodes = ({ scenario, setScenarios }) => {
     }
   }, [selectedEdge]);
 
+  const handleNodesChange = useCallback(
+    (changes) => {
+      changes.forEach((change) => {
+        if (change.type === 'position' && change.dragging) {
+          const draggedNode = nodes.find((node) => node.id === change.id);
+          if (draggedNode) {
+            const childNodes = nodes.filter(
+              (node) => node.data.parentId === draggedNode.id
+            );
+            
+            // Calculate position delta
+            const deltaX = change.position.x - draggedNode.position.x;
+            const deltaY = change.position.y - draggedNode.position.y;
+
+            // Update child node positions
+            childNodes.forEach((childNode) => {
+              const index = changes.findIndex((c) => c.id === childNode.id);
+              if (index === -1) {
+                changes.push({
+                  type: 'position',
+                  id: childNode.id,
+                  position: {
+                    x: childNode.position.x + deltaX,
+                    y: childNode.position.y + deltaY,
+                  },
+                  dragging: true,
+                });
+              }
+            });
+          }
+        }
+      });
+      
+      contextOnNodesChange(changes);
+    },
+    [nodes, contextOnNodesChange]
+  );
+
   const onConnect = useCallback(
     (params) => {
       const { source, target } = params;
@@ -260,7 +295,7 @@ const Nodes = ({ scenario, setScenarios }) => {
       onInit={onInit}
       onConnect={onConnect}
       onEdgesChange={onEdgesChange}
-      onNodesChange={onNodesChange}
+      onNodesChange={handleNodesChange}
       snapToGrid={true}
       snapGrid={[15, 15]}
       onNodeClick={onSelectNode}
