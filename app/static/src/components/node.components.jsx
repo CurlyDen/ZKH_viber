@@ -364,7 +364,7 @@ const Nodes = ({ scenario, setScenarios }) => {
             <textarea
               value={nodeDesc}
               onChange={(e) => setNodeDesc(e.target.value)}
-              className="w-full h-20 p-1 outline-none resize-none overflow-x-hidden overflow-y-auto"
+              className="w-full p-1 outline-none overflow-x-hidden overflow-y-auto resize-y min-h-[80px] max-h-[200px]"
             />
           </div>
         </div>

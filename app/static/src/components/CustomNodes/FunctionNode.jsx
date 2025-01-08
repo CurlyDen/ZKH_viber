@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Handle, Position } from "reactflow";
 import styles from "./CustomNode.module.css";
 import NodeControls from "../NodeControls/NodeControls";
 import { useNodesContext } from "../../context/NodeContext";
 
-
 const FunctionNode = ({ id, data }) => {
   const { nodes, setNodes, edges, setNodeDesc, selectedNode, setSelectedNode } = useNodesContext();
-  const [isEditing, setIsEditing] = useState(false);
+  const [textareaHeight, setTextareaHeight] = useState('auto');
+  const textareaRef = useRef(null);
+  const cursorPositionRef = useRef(null);
 
   const parentId = data.parentId;
   const hasOutgoingEdge = edges.some(edge => edge.source === id);
@@ -61,16 +62,22 @@ const FunctionNode = ({ id, data }) => {
       setSelectedNode(nodes.find((node) => node.id === id));
   };
 
-  const handleBlur = () => {
-    setIsEditing(false);
+  const handleTextareaChange = (e) => {
+    cursorPositionRef.current = e.target.selectionStart;
+    
+    setNodeDesc(e.target.value);
+    setTextareaHeight('auto');
+    setTextareaHeight(`${e.target.scrollHeight}px`);
   };
 
   useEffect(() => {
-    setIsEditing(true);
-    if (selectedNode !== nodes.find((node) => node.id === id)) {
-      handleBlur();
+    if (textareaRef.current && cursorPositionRef.current !== null) {
+      textareaRef.current.setSelectionRange(
+        cursorPositionRef.current,
+        cursorPositionRef.current
+      );
     }
-  }, [selectedNode]);
+  });
 
   return (
     <div className={styles.functionNode}>
@@ -97,20 +104,18 @@ const FunctionNode = ({ id, data }) => {
           type="target"
         />
 
-        {isEditing ? (
-          <textarea
-            id={`textarea-${id}`}
-            value={data.description}
-            onChange={(e) => setNodeDesc(e.target.value)}
-            onBlur={handleBlur}
-            spellCheck={false}
-            className="nodrag h-10 w-full bg-transparent cursor-pointer text-sm px-12 outline-none resize-none overflow-hidden break-words"
-          />
-        ) : (
-          <div className="w-full bg-transparent h-10 cursor-pointer text-sm px-12 text-ellipsis overflow-hidden break-words">
-            {data.description}
-          </div>
-        )}
+        <textarea
+          ref={textareaRef}
+          id={`textarea-${id}`}
+          value={data.description}
+          onChange={handleTextareaChange}
+          style={
+            selectedNode?.id === id
+              ? { height: textareaHeight }
+              : { height: '42px' }
+          }
+          className="nodrag w-full bg-transparent cursor-pointer text-sm px-12 outline-none resize-none overflow-hidden break-words"
+        />
       </div>
     </div>
   );

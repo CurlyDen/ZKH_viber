@@ -1,6 +1,6 @@
 import { Handle, Position } from 'reactflow';
 import styles from './CustomNode.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNodesContext } from '../../context/NodeContext';
 import DeleteNodeButton from '../DeleteNodeButton';
 import { TiPlus } from "react-icons/ti";
@@ -8,9 +8,13 @@ import { TiPlus } from "react-icons/ti";
 export default function CustomNode({ id, data }) {
   const { nodes, setNodes, edges, selectedNode } = useNodesContext();
   const hasOutgoingEdge = edges.some(edge => edge.source === id);
+  const textareaRef = useRef(null);
+  const cursorPositionRef = useRef(null);
 
   const [textareaHeight, setTextareaHeight] = useState('auto');
-  const [functionCounter, setFunctionCounter] = useState(nodes.filter((n) => n.id.startsWith(`${id}-tree`)).length + 1 || 1);
+  const [functionCounter, setFunctionCounter] = useState(
+    nodes.filter((n) => n.id.startsWith(`${id}-tree`)).length + 1 || 1
+  );
 
   useEffect(() => {
     setFunctionCounter(
@@ -19,6 +23,8 @@ export default function CustomNode({ id, data }) {
   }, [nodes.length]);
 
   const handleTextareaChange = (e) => {
+    cursorPositionRef.current = e.target.selectionStart;
+
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === id) {
@@ -35,23 +41,60 @@ export default function CustomNode({ id, data }) {
     setTextareaHeight(`${e.target.scrollHeight}px`);
   };
 
+  useEffect(() => {
+    if (textareaRef.current && cursorPositionRef.current !== null) {
+      textareaRef.current.setSelectionRange(
+        cursorPositionRef.current,
+        cursorPositionRef.current
+      );
+    }
+  });
+
+  const updateChildNodesPositions = (parentNode, childNodes) => {
+    const verticalSpacing = 55;
+    const baseOffset = 104;
+    
+    return nodes.map(node => {
+      if (node.data.parentId === id) {
+        const index = childNodes.findIndex(n => n.id === node.id);
+        if (index !== -1) {
+          return {
+            ...node,
+            position: {
+              x: parentNode.position.x,
+              y: parentNode.position.y + baseOffset + (index * verticalSpacing)
+            }
+          };
+        }
+      }
+      return node;
+    });
+  };
+
   const createChildNode = () => {
     const parentNode = nodes.find((n) => n.id === id);
-    const childNodes = nodes.filter((n) => n.id.startsWith(`${id}-tree`));
+    const childNodes = nodes
+      .filter((n) => n.id.startsWith(`${id}-tree`))
+      .sort((a, b) => a.position.y - b.position.y);
+    
+    const verticalSpacing = 55;
+    const baseOffset = 104;
     
     const newNode = {
       id: `${id}-tree-${functionCounter}`,
       type: 'function',
       position: {
         x: parentNode.position.x,
-        y: parentNode.position.y + 104 + childNodes.length * 55,
+        y: parentNode.position.y + baseOffset + (childNodes.length * verticalSpacing)
       },
       style: { backgroundColor: '#ffffff' },
-      data: { label: '', description: '', parentId: id },
+      data: { label: '', description: '', parentId: id }
     };
+
+    const updatedNodes = updateChildNodesPositions(parentNode, [...childNodes, newNode]);
     
-    setFunctionCounter((prev) => prev + 1);
-    setNodes((nds) => [...nds, newNode]);
+    setFunctionCounter(prev => prev + 1);
+    setNodes([...updatedNodes, newNode]);
   };
 
   return (
@@ -73,6 +116,7 @@ export default function CustomNode({ id, data }) {
       </div>
 
       <textarea
+        ref={textareaRef}
         id={`textarea-${id}`}
         value={data.description}
         onChange={handleTextareaChange}
